@@ -15,9 +15,9 @@ public class Env extends EnvironmentDescription {
 
     Env() {
 
-        light1SetPosition(-8, 4, 0);
+        light1SetPosition(-8, 2, 0);
         light1IsOn = true;
-        light2SetPosition(8, 4, 0);
+        light2SetPosition(8, 2, 0);
         light2IsOn = false;
 
         // Wall w1 = new Wall(new Vector3d(9, 0, 0), 19, 1, this);
@@ -40,10 +40,12 @@ public class Env extends EnvironmentDescription {
         // b.rotate90(1);
         // add(b);
 
-        add(new Box(new Vector3d(2, 0, 0), new Vector3f(6, 1, 6), this));
+        add(new Box(new Vector3d(1.4, 0, 0), new Vector3f(6, 1, 6), this));
 
         add(new Box(new Vector3d(-3, 0, 0), new Vector3f(1, 1, 1), this));
 
-        add(new MyRobot(new Vector3d(8, 0, 0), "terminator", 36, new Point3d(-8, 0, 5)));
+        add(new Box(new Vector3d(-5, 0, 0), new Vector3f(1, 1, 1), this));
+
+        add(new MyRobot(new Vector3d(8, 0, 0), "terminator", 36, new Point3d(-8, 0, 0)));
     }
 }

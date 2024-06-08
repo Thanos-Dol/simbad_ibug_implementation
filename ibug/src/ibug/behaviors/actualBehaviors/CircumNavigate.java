@@ -48,9 +48,6 @@ public class CircumNavigate extends Behavior {
                 return false;
             }
         }
-        // d
-        System.out.println("Left");
-        // d
         return true;
     }
 

@@ -33,6 +33,10 @@ public class MoveToTarget extends Behavior {
         terminator.getCoords(r);
         Point3d goal_local = ToolKit.get_local_coords(terminator, goal);
 
-        return new Velocities(K * goal_local.distance(new Point3d(0, 0, 0)), 0.0);
+        double clum = get_sensors().get_center_light_sensor().getLux();
+
+        double new_velocity = clum > 0.08 ? 0.0 : K * goal_local.distance(new Point3d(0, 0, 0)); // 0.0864
+
+        return new Velocities(new_velocity, 0.0);
     }
 }

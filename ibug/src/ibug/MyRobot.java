@@ -120,6 +120,14 @@ public class MyRobot extends Agent {
     }
 
     public void performBehavior() {
+
+        //
+        Point3d local_goal = ToolKit.get_local_coords(this, goal);
+        if (local_goal.distance(new Point3d(0, 0, 0)) <= 0.6) {
+            System.out.println(sensors.get_center_light_sensor().getLux());
+        }
+        //
+
         boolean behaviour_active_status[] = new boolean[behaviors.length];
 
         for (int i = 0; i < behaviour_active_status.length; ++i) {
