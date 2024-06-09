@@ -1,16 +1,10 @@
 package ibug;
 
-import javax.media.j3d.Transform3D;
-import javax.vecmath.Matrix3d;
-import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
 import simbad.sim.Agent;
-import simbad.sim.RangeSensorBelt;
-import simbad.sim.LightSensor;
 import simbad.sim.RobotFactory;
 
-import ibug.ToolKit;
 import ibug.behaviors.Behavior;
 import ibug.behaviors.Sensors;
 import ibug.behaviors.Velocities;
@@ -50,45 +44,19 @@ public class MyRobot extends Agent {
         this.circum_navigating = circum_navigating_value;
     }
 
-    Point3d goal;
-
-    public MyRobot(Vector3d position, String name, int num_of_sensors, Point3d goal) {
+    public MyRobot(Vector3d position, String name, int num_of_sensors) {
         super(position, name);
 
         sensors = new Sensors(RobotFactory.addSonarBeltSensor(this, num_of_sensors),
-                RobotFactory.addBumperBeltSensor(this, num_of_sensors),
-                RobotFactory.addLightSensor(this, new Vector3d(0.4, 0.3, -0.4), 0, "left light sensor"), // ! find out
-                                                                                                         // what third
-                                                                                                         // parameter
-                                                                                                         // is, might
-                                                                                                         // cause
-                                                                                                         // trouble
-                                                                                                         // new
-                                                                                                         // Vector3d(0.25,
-                                                                                                         // 0.3, -0.25)
-                RobotFactory.addLightSensor(this, new Vector3d(0.4, 0.3, 0.4), 0, "right light sensor"), // ! find out
-                                                                                                         // what third
-                                                                                                         // parameter
-                                                                                                         // is, might
-                                                                                                         // cause
-                                                                                                         // trouble
-                                                                                                         // new
-                                                                                                         // Vector3d(0.25,
-                                                                                                         // 0.3, 0.25)
-                RobotFactory.addLightSensor(this, new Vector3d(0, 0.3, 0), 0, "right light sensor") // ! find out what
-                                                                                                    // third parameter
-                                                                                                    // is, might cause
-                                                                                                    // trouble
-                                                                                                    // new Vector3d(0,
-                                                                                                    // 0.3, 0)
-        );
+                RobotFactory.addLightSensor(this, new Vector3d(0.4, 0.3, -0.4), 0, "left light sensor"),
+                RobotFactory.addLightSensor(this, new Vector3d(0.4, 0.3, 0.4), 0, "right light sensor"),
+                RobotFactory.addLightSensor(this, new Vector3d(0, 0.3, 0), 0, "right light sensor"));
 
         behaviors = new Behavior[3];
 
         behaviors[0] = new CircumNavigate(
                 sensors,
                 this,
-                goal,
                 7,
                 CLOCKWISE);
 
@@ -98,8 +66,7 @@ public class MyRobot extends Agent {
 
         behaviors[2] = new MoveToTarget(
                 this,
-                sensors,
-                goal);
+                sensors);
 
         boolean[][] temp = {
                 { false, true, true },
@@ -108,7 +75,6 @@ public class MyRobot extends Agent {
         };
 
         subsumption_matrix = temp;
-        this.goal = goal;
     }
 
     public void initBehavior() {
@@ -120,14 +86,6 @@ public class MyRobot extends Agent {
     }
 
     public void performBehavior() {
-
-        //
-        Point3d local_goal = ToolKit.get_local_coords(this, goal);
-        if (local_goal.distance(new Point3d(0, 0, 0)) <= 0.6) {
-            System.out.println(sensors.get_center_light_sensor().getLux());
-        }
-        //
-
         boolean behaviour_active_status[] = new boolean[behaviors.length];
 
         for (int i = 0; i < behaviour_active_status.length; ++i) {

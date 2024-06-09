@@ -1,24 +1,18 @@
 package ibug.behaviors.actualBehaviors;
 
-import javax.vecmath.Point3d;
-
 import ibug.behaviors.Behavior;
 import ibug.behaviors.Sensors;
 import ibug.behaviors.Velocities;
-import simbad.sim.Agent;
 import ibug.MyRobot;
-import ibug.ToolKit;
 
 public class MoveToTarget extends Behavior {
 
     MyRobot terminator;
-    static double K = 0.1; // ! test numbers for this one
-    Point3d goal;
+    static double K = 0.5;
 
-    public MoveToTarget(MyRobot terminoid, Sensors sensors, Point3d goal) {
+    public MoveToTarget(MyRobot terminoid, Sensors sensors) {
         super(sensors);
         this.terminator = terminoid;
-        this.goal = goal;
     }
 
     @Override
@@ -29,14 +23,8 @@ public class MoveToTarget extends Behavior {
     @Override
     public Velocities act() {
 
-        Point3d r = new Point3d();
-        terminator.getCoords(r);
-        Point3d goal_local = ToolKit.get_local_coords(terminator, goal);
-
         double clum = get_sensors().get_center_light_sensor().getLux();
-
-        double new_velocity = clum > 0.08 ? 0.0 : K * goal_local.distance(new Point3d(0, 0, 0)); // 0.0864
-
+        double new_velocity = clum > 0.08 ? 0.0 : K; // 0.0864
         return new Velocities(new_velocity, 0.0);
     }
 }

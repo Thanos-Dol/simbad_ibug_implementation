@@ -1,7 +1,6 @@
 package ibug.behaviors.actualBehaviors;
 
 import java.util.LinkedList;
-import java.util.Queue;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
@@ -10,15 +9,11 @@ import ibug.behaviors.Behavior;
 import ibug.behaviors.Sensors;
 import ibug.behaviors.Velocities;
 import ibug.MyRobot;
-import ibug.ToolKit;
 
-import simbad.demo.LightSearchDemo;
-import simbad.sim.Agent;
 import simbad.sim.RangeSensorBelt;
 import simbad.sim.LightSensor;
 
 public class CircumNavigate extends Behavior {
-    Point3d goal;
     MyRobot terminator;
     boolean CLOCKWISE;
 
@@ -38,8 +33,7 @@ public class CircumNavigate extends Behavior {
         }
 
         for (int i = 0; i < (num_of_last_lum_reads - 1) / 2; ++i) {
-            if (last_lum_reads.get(i) > last_lum_reads.get(i + 1)) { // ! will it become noticeably faster if I returned
-                                                                     // the whole array and worked on the array instead?
+            if (last_lum_reads.get(i) > last_lum_reads.get(i + 1)) {
                 return false;
             }
         }
@@ -49,6 +43,14 @@ public class CircumNavigate extends Behavior {
             }
         }
         return true;
+    }
+
+    public static double wrapToPi(double a) {
+        if (a > Math.PI)
+            return a - Math.PI * 2;
+        if (a <= -Math.PI)
+            return a + Math.PI * 2;
+        return a;
     }
 
     public Point3d get_sensed_point(int sonar) {
@@ -64,16 +66,12 @@ public class CircumNavigate extends Behavior {
         return new Point3d(x, 0, z);
     }
 
-    public CircumNavigate(Sensors sensors, MyRobot terminoid, Point3d goal, int num_of_last_lum_reads,
+    public CircumNavigate(Sensors sensors, MyRobot terminoid, int num_of_last_lum_reads,
             boolean CLOCKWISE) {
         super(sensors);
         this.terminator = terminoid;
-        this.goal = goal;
         this.CLOCKWISE = CLOCKWISE;
         this.num_of_last_lum_reads = num_of_last_lum_reads;
-
-        // completed = true;
-
         this.last_lum_reads = new LinkedList<Double>();
         count = 0;
     }
@@ -95,16 +93,14 @@ public class CircumNavigate extends Behavior {
         double phRot = Math.atan(K3 * (d - SAFETY));
         if (CLOCKWISE)
             phRot = -phRot;
-        double phRef = ToolKit.wrapToPi(phLin + phRot);
+        double phRef = wrapToPi(phLin + phRot);
 
         if (count >= 10) {
             if (last_lum_reads.size() == num_of_last_lum_reads) {
-                last_lum_reads.poll(); // ! double check that poll() works in linked list the same way as in queue
+                last_lum_reads.poll();
             }
 
-            last_lum_reads.offer(center_light_sensor.getLux()); // ! double check that offer() works in linked list the
-                                                                // same
-                                                                // way as in queue
+            last_lum_reads.offer(center_light_sensor.getLux());
         }
 
         count += 1;
@@ -133,7 +129,7 @@ public class CircumNavigate extends Behavior {
         int i, j;
         i = 7; // k - 2, k = n/4
         j = 0; // for 2k - 3 checks
-        for (j = 0; j < 15; ++j) { // ! this will change and become a function of the number of sonars I have
+        for (j = 0; j < 15; ++j) {
             if (sonars.getMeasurement(i) < 0.7) {
                 if (i > 0) {
                     this.CLOCKWISE = false;
@@ -153,46 +149,5 @@ public class CircumNavigate extends Behavior {
         }
 
         return false;
-
     }
-
-    // public boolean is_active() {
-    // if (!completed) {
-    // Point3d r = new Point3d();
-    // terminator.getCoords(r);
-    // double f = Math.atan2(r.z - goal.z, goal.x - r.x);
-    // double dist = r.distance(goal);
-
-    // if (hit_point.distance(r) > 1) {
-    // circleCompleted = true;
-    // }
-    // if (circleCompleted && dist < initial_dist && Math.abs(f - fToGoal) < 0.05) {
-    // completed = true;
-    // return false;
-    // }
-    // return true;
-    // }
-    // RangeSensorBelt sonars = get_sensors().get_sonars();
-    // Point3d lg = ToolKit.get_local_coords(terminator, goal);
-    // double f2g = Math.atan2(lg.z, lg.x), minDist = Double.POSITIVE_INFINITY,
-    // phRef;
-    // for (int i = 0; i < sonars.getNumSensors(); i++) {
-    // double ph = ToolKit.wrapToPi(sonars.getSensorAngle(i));
-    // if (Math.abs(ph - f2g) <= Math.PI / 2) {
-    // minDist = minDist < sonars.getMeasurement(i) ? minDist :
-    // sonars.getMeasurement(i);
-    // }
-    // }
-    // if (minDist <= 0.5) {
-    // completed = false;
-    // Point3d r = new Point3d();
-    // terminator.getCoords(r);
-    // fToGoal = Math.atan2(r.z - goal.z, goal.x - r.x);
-    // initial_dist = r.distance(goal);
-    // circleCompleted = false;
-    // hit_point = r;
-    // return true;
-    // }
-    // return false;
-    // }
 }
